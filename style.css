@@ -46,7 +46,7 @@ body{
 
 .controls_btns button:active{/*버튼 눌렸을 때 효과 줄 수 있음 내가 momentum에 todolist 삭제할 때 이와 같은 효과를 쓰려고 일일이 크기변화를 지정했었다*/
     transform: scale(0.98);
-    /*git이 제대로 되는걸까*/
+    /*git이 제대로 되는걸까?*/
 }
 .controls .controls_colors{
     display: flex;
