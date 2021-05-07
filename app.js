@@ -7,22 +7,37 @@ const colors = document.getElementsByClassName("jsColor");
 기본적으로 canvas는 css로 만들고 js에서는 pixel을 다룰 수 있는 element로 만드는 거라서
 width와 height를 지정해줘야한다.(보통 canvas와 같은 size로)
 */
-canvas.width = 700;
-canvas.height = 700;
+//ctrl + z 기능? : You might have to save the coordinates on an array. And when ctrl + z you can paint them white again.
 
+const range = document.getElementById("jsRange");
+const mode = document.getElementById("jsMode");
+const saveBtn = document.getElementById("jsSave");
 
-ctx.strokeStyle ="#2c2c2c";//우리가 그릴 선들이 모두 이 색을 갖는다고 말해준다.
+const INITIAL_COLOR ="#2c2c2c";
+const CANVAS_SIZE = 700;
+
+canvas.width = CANVAS_SIZE;
+canvas.height = CANVAS_SIZE;
+
+ctx.fillStyle = "white";
+ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+ctx.strokeStyle =INITIAL_COLOR;//우리가 그릴 선들이 모두 이 색을 갖는다고 말해준다.
 ctx.lineWidth = 2.5;
+ctx.fillStyle =INITIAL_COLOR;
 
 
 let painting = false;
+let filling = false;
 
 function stopPainting(){
     painting = false;
 }
 
 function startPainting(){
-    painting = true;
+    if(filling === false){//filling mode에서 클릭하고 드래그하면 잠시동안 paint되고, 마우스를 떼었을때 비로소 fill이 되는 현상 해결방법
+      painting = true;
+    }
 }
 function onMouseMove(event){
     const x = event.offsetX;
@@ -42,13 +57,47 @@ function onMouseMove(event){
 function handleColorClick(event){
     const color = event.target.style.backgroundColor;
     ctx.strokeStyle = color;
+    ctx.fillStyle = color;
 }
 
+function handleRangeChange(event){
+    const size= event.target.value;
+    ctx.lineWidth =size;
+}
+
+function handleModeClick(event){
+    if(filling === true){
+        filling = false;
+        mode.innerText = "Fill";
+    }else{
+        filling = true;
+        mode.innerText = "Paint";
+    }
+}
+function handelCanvasClick(){
+    if(filling){
+        ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    }
+}
+function handleCM(event){
+    event.preventDefault();
+}
+function handelSaveClick(event){
+    const image = canvas.toDataURL();
+    const link = document.createElement("a");
+    link.href = image;//href는 image = URL이 되어야하고
+    link.download = "PaintJS✍";//download는 download될 파일의 이름?
+    link.click();
+    //위에서 만든 link자체가 click되면 image가 download되도록 한거니까
+    //link를 click하도록 해서 다운로드하도록 하는 것 이다.
+}
 if(canvas){//canvas가 존재하는지 check
     canvas.addEventListener("mousemove",onMouseMove);
     canvas.addEventListener("mousedown", startPainting);
     canvas.addEventListener("mouseup", stopPainting);
     canvas.addEventListener("mouseleave",stopPainting);//마우스가 canvas 바깥으로 나갔을 때
+    canvas.addEventListener("click",handelCanvasClick);
+    canvas.addEventListener("contextmenu", handleCM);//contextmenu는 canvas에서 우클릭하면 나오는 메뉴
 }
 
 
@@ -56,3 +105,15 @@ Array.from(colors).forEach(color =>
      color.addEventListener("click", handleColorClick)
      );
      //color은 colors안의 각각의 div를 나타냄 여러 색을 배열로 저장한 Arrays.form(colors)안에는 색이 있는 div가 요소로 들어있다.
+
+if(range){
+    range.addEventListener("input", handleRangeChange)//왜 input으로 할까나?
+}
+
+if(mode){
+    mode.addEventListener("click", handleModeClick);
+}
+
+if(saveBtn){
+    saveBtn.addEventListener("click", handelSaveClick)
+}
